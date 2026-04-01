@@ -24,7 +24,9 @@ fun WearNavGraph() {
 
     HorizontalPager(
         state = pagerState,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .androidx.compose.foundation.background(androidx.wear.compose.material.MaterialTheme.colors.background)
     ) { page ->
         when (page) {
             0 -> HomeScreen(
