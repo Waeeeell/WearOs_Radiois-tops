@@ -1,3 +1,4 @@
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,14 +7,14 @@ plugins {
 
 android {
     namespace = "com.example.radioistops"
-    compileSdk {
-        version = release(36)
-    }
+    // CORRECCIÓN: Se usa la sintaxis directa. 35 es la versión estable actual.
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.radioistops"
         minSdk = 30
-        targetSdk = 36
+        // CORRECCIÓN: Ajustado a 35 para que coincida con compileSdk
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }
@@ -31,12 +32,15 @@ android {
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        // CORRECCIÓN: Se recomienda Java 17 para proyectos modernos de Compose
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 }
 
@@ -59,4 +63,5 @@ dependencies {
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.gson)
     implementation(libs.coroutines.android)
+    implementation(libs.material3)
 }
