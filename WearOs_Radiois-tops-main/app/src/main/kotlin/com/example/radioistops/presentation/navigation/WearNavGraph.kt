@@ -26,8 +26,9 @@ fun WearNavGraph() {
         state = pagerState,
         modifier = Modifier
             .fillMaxSize()
-            .androidx.compose.foundation.background(androidx.wear.compose.material.MaterialTheme.colors.background)
+            .androidx.compose.foundation.background(androidx.compose.ui.graphics.Color.Red) // TEST: Fondo rojo para forzar visibilidad
     ) { page ->
+        android.util.Log.e("DEBUG_WEAR", "Pager intentando renderizar pagina: $page")
         when (page) {
             0 -> HomeScreen(
                 viewModel = viewModel,
