@@ -4,41 +4,34 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.radioistops.presentation.screens.DetailScreen
+
+// Importamos única y exclusivamente TUS pantallas
 import com.example.radioistops.presentation.screens.HomeScreen
-import com.example.radioistops.presentation.screens.SOSScreen
-import com.example.radioistops.presentation.screens.SensorsScreen
-import com.example.radioistops.presentation.viewmodels.MainViewModel
-import kotlinx.coroutines.launch
+import com.example.radioistops.presentation.screens.ActivityScreen
+import com.example.radioistops.presentation.screens.EcgIntroScreen
+import com.example.radioistops.presentation.screens.EcgRecordingScreen
+import com.example.radioistops.presentation.screens.O2intro
+import com.example.radioistops.presentation.screens.O2recording
+import com.example.radioistops.presentation.screens.SosScreen
 
 @Composable
 fun WearNavGraph() {
-    val viewModel: MainViewModel = viewModel()
-    
-    // Configurar el Pager para manejar las 4 pantallas (páginas 0 a 3)
-    val pagerState = rememberPagerState(pageCount = { 4 })
-    val coroutineScope = rememberCoroutineScope()
+    // Definimos exactamente tus 7 pantallas
+    val pagerState = rememberPagerState(pageCount = { 7 })
 
     HorizontalPager(
         state = pagerState,
         modifier = Modifier.fillMaxSize()
     ) { page ->
         when (page) {
-            0 -> HomeScreen(
-                viewModel = viewModel,
-                onNavigate = { _ ->
-                    // Navegar programáticamente a Detail (Página 1) si se toca el botón en el Home
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(1)
-                    }
-                }
-            )
-            1 -> DetailScreen()
-            2 -> SOSScreen()
-            3 -> SensorsScreen()
+            0 -> HomeScreen()
+            1 -> ActivityScreen()
+            2 -> EcgIntroScreen()
+            3 -> EcgRecordingScreen()
+            4 -> O2intro()
+            5 -> O2recording()
+            6 -> SosScreen()
         }
     }
 }

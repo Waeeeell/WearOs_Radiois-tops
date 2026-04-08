@@ -8,8 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.wear.compose.material.Text
 
 @Composable
-fun HomeScreen() {
+fun O2intro() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("HomeScreen Prueba", style = androidx.wear.compose.material.MaterialTheme.typography.caption2)
+        Text("02intro", style = androidx.wear.compose.material.MaterialTheme.typography.caption2)
     }
 }
