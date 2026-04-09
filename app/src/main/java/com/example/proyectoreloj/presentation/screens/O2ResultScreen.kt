@@ -1,6 +1,5 @@
 package com.example.radioistops.presentation.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -18,7 +16,6 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Text
-import com.example.radioistops.R
 
 @Preview(
     device = Devices.WEAR_OS_SMALL_ROUND,
@@ -27,18 +24,12 @@ import com.example.radioistops.R
     showBackground = true
 )
 @Composable
-fun EcgResultScreenPreview() {
-    EcgResultScreen(result = 72, onFinish = {})
+fun O2ResultScreenPreview() {
+    O2ResultScreen(result = 98, onFinish = {})
 }
 
 @Composable
-fun EcgResultScreen(result: Int, onFinish: () -> Unit) {
-    val (statusText, statusColor) = when {
-        result < 50 -> "Frecuencia baja" to Color.Yellow
-        result <= 100 -> "Frecuencia normal" to Color(0xFF2ECC71) // Verde
-        else -> "Frecuencia alta" to Color.Red
-    }
-
+fun O2ResultScreen(result: Int, onFinish: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -47,59 +38,46 @@ fun EcgResultScreen(result: Int, onFinish: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
-        // 1. Título principal
         Text(
             text = "Resultado",
+            color = Color(0xFF65D4F9),
+            fontWeight = FontWeight.Bold,
+            fontSize = 7.sp,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Text(
+            text = "$result%",
             color = Color.White,
             fontWeight = FontWeight.Bold,
-            fontSize = 7.sp,
+            fontSize = 24.sp,
             textAlign = TextAlign.Center
         )
-
-        Spacer(modifier = Modifier.height(7.dp))
-
-        // 2. Imagen del electrocardiograma
-        Box(
-            modifier = Modifier
-                .height(55.dp)
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ecg),
-                contentDescription = "Línea ECG",
-                modifier = Modifier.fillMaxSize()
-            )
-        }
-
-//        Spacer(modifier = Modifier.height(6.dp))
-
-        // 3. Texto del resultado
+        
         Text(
-            text = "$result BPM - $statusText",
-            color = statusColor,
-            fontWeight = FontWeight.Bold,
-            fontSize = 7.sp,
+            text = "SpO2",
+            color = Color.White,
+            fontSize = 8.sp,
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(15.dp))
 
-        // 4. Botón verde "Finalizar"
         Button(
-            onClick = onFinish,
+            onClick = { onFinish() },
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(0xFF2ECC71),
+                backgroundColor = Color(0xFF65D4F9),
                 contentColor = Color.Black
             ),
             modifier = Modifier
-                .fillMaxWidth(0.4f)
+                .fillMaxWidth(0.5f)
                 .height(16.dp),
             shape = RoundedCornerShape(50)
         ) {
             Text(
-                text = "Finalizar",
+                text = "Volver",
                 fontWeight = FontWeight.Bold,
                 fontSize = 7.sp
             )

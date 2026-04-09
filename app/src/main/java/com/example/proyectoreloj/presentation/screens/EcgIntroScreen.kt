@@ -69,7 +69,7 @@ fun EcgIntroScreen(onStartEcg: () -> Unit) {
             )
         }
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(3.dp))
 
         // 3. Texto de advertencia
         Text(
