@@ -161,7 +161,7 @@ fun HomeScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .rotate(160f),
+                .rotate(152f), // Ajuste longitudinal
             contentAlignment = Alignment.CenterEnd
         ) {
             Text(
@@ -170,7 +170,7 @@ fun HomeScreen(
                 fontSize = 8.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .padding(end = 2.dp)
+                    .padding(start = 10.dp) // Ajuste latitudinal (centrado en trazo)
                     .rotate(-90f)
             )
         }
@@ -178,7 +178,7 @@ fun HomeScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .rotate(20f),
+                .rotate(28f), // Ajuste longitudinal
             contentAlignment = Alignment.CenterEnd
         ) {
             Text(
@@ -187,9 +187,11 @@ fun HomeScreen(
                 fontSize = 8.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .padding(end = 2.dp)
+                    .padding(start = 10.dp) // Ajuste latitudinal (centrado en trazo)
                     .rotate(-90f)
             )
         }
     }
 }
+
+

@@ -144,7 +144,7 @@ fun ActivityScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .rotate(160f),
+                .rotate(152f), // Alineado casi al extremo final
             contentAlignment = Alignment.CenterEnd
         ) {
             Text(
@@ -153,7 +153,7 @@ fun ActivityScreen(
                 fontSize = 8.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .padding(end = 2.dp)
+                    .padding(start = 10.dp) // Forzado hacia el interior para centrarse en el trazo de 10dp
                     .rotate(-90f)
             )
         }
@@ -161,7 +161,7 @@ fun ActivityScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .rotate(20f),
+                .rotate(28f), // Alineado casi al extremo inicial
             contentAlignment = Alignment.CenterEnd
         ) {
             Text(
@@ -170,7 +170,7 @@ fun ActivityScreen(
                 fontSize = 8.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .padding(end = 2.dp)
+                    .padding(start = 10.dp) // Forzado hacia el interior para centrarse en el trazo de 10dp
                     .rotate(-90f)
             )
         }
