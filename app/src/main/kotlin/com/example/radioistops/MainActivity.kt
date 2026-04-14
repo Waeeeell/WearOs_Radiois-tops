@@ -6,16 +6,21 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.radioistops.data.model.WatchEstado
 import com.example.radioistops.presentation.screens.*
 
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.TimeText
-import kotlinx.coroutines.launch
+import com.example.radioistops.presentation.viewmodels.MainViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 class MainActivity : ComponentActivity() {
@@ -23,53 +28,29 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
-            // Ahora tenemos 5 páginas fijas en el scroll. Las de grabación son "especiales".
             val pagerState = rememberPagerState(pageCount = { 5 })
             var showRecording by remember { mutableStateOf(false) }
             var showO2Recording by remember { mutableStateOf(false) }
             var ecgResult by remember { mutableStateOf<Int?>(null) }
             var o2Result by remember { mutableStateOf<Int?>(null) }
-            val scope = rememberCoroutineScope()
+
+            val vm: MainViewModel = viewModel()
+            val estado = vm.estado
 
             MaterialTheme {
                 Scaffold(
-                    timeText = { 
-                        // Ocultamos hora en Home (0), ECG Intro (2), SOS (3), O2 Intro (4) y en grabaciones
-                        if (pagerState.currentPage != 0 &&
-                            pagerState.currentPage != 2 &&
-                            pagerState.currentPage != 3 && 
-                            pagerState.currentPage != 4 && 
-                            !showRecording && !showO2Recording && ecgResult == null && o2Result == null) {
-                            TimeText() 
+                    timeText = {
+                        if (!showRecording && !showO2Recording && ecgResult == null && o2Result == null) {
+                            TimeText()
                         }
                     }
                 ) {
                     when {
-                        showRecording -> {
-                            EcgRecordingScreen(onFinish = { result ->
-                                showRecording = false
-                                ecgResult = result
-                            })
-                        }
-                        showO2Recording -> {
-                            O2recording(onFinish = { result ->
-                                showO2Recording = false
-                                o2Result = result
-                            })
-                        }
-                        ecgResult != null -> {
-                            EcgResultScreen(result = ecgResult!!, onFinish = { ecgResult = null })
-                        }
-                        o2Result != null -> {
-                            O2ResultScreen(result = o2Result!!, onFinish = { o2Result = null })
-                        }
-                        else -> {
-                            WearNavGraph(
-                                pagerState = pagerState,
-                                onStartEcg = { showRecording = true },
-                                onStartO2 = { showO2Recording = true }
-                            )
-                        }
+                        showRecording -> EcgRecordingScreen(onFinish = { result -> showRecording = false; ecgResult = result })
+                        showO2Recording -> O2recording(onFinish = { result -> showO2Recording = false; o2Result = result })
+                        ecgResult != null -> EcgResultScreen(result = ecgResult!!, onFinish = { ecgResult = null })
+                        o2Result != null -> O2ResultScreen(result = o2Result!!, onFinish = { o2Result = null })
+                        else -> WearNavGraph(pagerState, { showRecording = true }, { showO2Recording = true }, estado)
                     }
                 }
             }
@@ -80,18 +61,38 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WearNavGraph(
-    pagerState: androidx.compose.foundation.pager.PagerState,
+    pagerState: PagerState,
     onStartEcg: () -> Unit,
-    onStartO2: () -> Unit
+    onStartO2: () -> Unit,
+    watchEstado: WatchEstado?
 ) {
-    HorizontalPager(
-        state = pagerState,
-        modifier = Modifier.fillMaxSize()
-    ) { page ->
+    HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
         when (page) {
-            0 -> HomeScreen()
-            1 -> ActivityScreen()
-            2 -> EcgIntroScreen(onStartEcg = onStartEcg)
+            0 -> {
+                if (watchEstado != null) {
+                    HomeScreen(
+                        mensajeApi = watchEstado.mensajeApi,
+                        diasSuperados = watchEstado.diasSuperados,
+                        diasRestantes = watchEstado.diasRestantes
+                        // Nota: HomeScreen no tiene parámetro porcentajeBateria aún
+                    )
+                } else {
+                    HomeScreen()
+                }
+            }
+            1 -> {
+                if (watchEstado != null) {
+                    ActivityScreen(
+                        diasSuperados = watchEstado.diasSuperados,
+                        diasRestantes = watchEstado.diasRestantes,
+                        diaActual = watchEstado.diaActual
+                        // Nota: ActivityScreen no tiene parámetros de título/mensaje aún
+                    )
+                } else {
+                    ActivityScreen()
+                }
+            }
+            2 -> EcgIntroScreen(onStartEcg)
             3 -> SosScreen()
             4 -> O2intro(onStartMeasure = onStartO2)
         }

@@ -1,28 +1,50 @@
 package com.example.radioistops.presentation.viewmodels
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.radioistops.domain.models.UiState
+import com.example.radioistops.data.model.WatchEstado
+import com.example.radioistops.data.network.RetrofitClient
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
-    private val _homeState = MutableStateFlow<UiState<String>>(UiState.Loading)
-    val homeState: StateFlow<UiState<String>> = _homeState.asStateFlow()
+    var estado by mutableStateOf<WatchEstado?>(null)
+        private set
+    var isLoading by mutableStateOf(true)
+        private set
+    var error by mutableStateOf<String?>(null)
+        private set
+
+    // El CIP del paciente logueado — por ahora hardcodeado,
+    // luego vendrá del login/SharedPreferences
+    private val cipPaciente = "LOMA020811005"
 
     init {
-        loadInitialData()
+        cargarEstado()
+        // Refresco automático cada 5 minutos
+        viewModelScope.launch {
+            while (true) {
+                delay(5 * 60 * 1000L)
+                cargarEstado()
+            }
+        }
     }
 
-    private fun loadInitialData() {
+    fun cargarEstado() {
         viewModelScope.launch {
-            _homeState.value = UiState.Loading
-            delay(1500) // Simulación red/sensores futura
-            _homeState.value = UiState.Success("Sistema Base Inicializado")
+            isLoading = true
+            error = null
+            try {
+                estado = RetrofitClient.apiService.getEstadoReloj(cipPaciente)
+            } catch (e: Exception) {
+                error = "Sin conexión con el servidor"
+            } finally {
+                isLoading = false
+            }
         }
     }
 }
