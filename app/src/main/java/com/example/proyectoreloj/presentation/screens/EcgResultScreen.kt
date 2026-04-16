@@ -53,7 +53,7 @@ fun EcgResultScreen(result: Int, onFinish: () -> Unit) {
             text = "Resultado",
             color = Color.White,
             fontWeight = FontWeight.Bold,
-            fontSize = 7.sp,
+            fontSize = 12.sp,
             textAlign = TextAlign.Center
         )
 
@@ -62,7 +62,7 @@ fun EcgResultScreen(result: Int, onFinish: () -> Unit) {
         // 2. Imagen del electrocardiograma
         Box(
             modifier = Modifier
-                .height(55.dp)
+                .height(80.dp)
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
@@ -80,7 +80,7 @@ fun EcgResultScreen(result: Int, onFinish: () -> Unit) {
             text = "$result BPM - $statusText",
             color = statusColor,
             fontWeight = FontWeight.Bold,
-            fontSize = 7.sp,
+            fontSize = 12.sp,
             textAlign = TextAlign.Center
         )
 
@@ -95,13 +95,13 @@ fun EcgResultScreen(result: Int, onFinish: () -> Unit) {
             ),
             modifier = Modifier
                 .fillMaxWidth(0.4f)
-                .height(16.dp),
+                .height(25.dp),
             shape = RoundedCornerShape(50)
         ) {
             Text(
                 text = "Finalizar",
                 fontWeight = FontWeight.Bold,
-                fontSize = 7.sp
+                fontSize = 12.sp
             )
         }
     }

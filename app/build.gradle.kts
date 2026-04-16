@@ -59,6 +59,10 @@ dependencies {
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.lifecycle.viewmodel.compose)
 
+    // Health Services
+    implementation(libs.health.services)
+    implementation(libs.guava)
+
     // API & Data
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.gson)

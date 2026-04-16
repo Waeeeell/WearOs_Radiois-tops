@@ -38,13 +38,7 @@ class MainActivity : ComponentActivity() {
             val estado = vm.estado
 
             MaterialTheme {
-                Scaffold(
-                    timeText = {
-                        if (!showRecording && !showO2Recording && ecgResult == null && o2Result == null) {
-                            TimeText()
-                        }
-                    }
-                ) {
+                Scaffold {
                     when {
                         showRecording -> EcgRecordingScreen(onFinish = { result -> showRecording = false; ecgResult = result })
                         showO2Recording -> O2recording(onFinish = { result -> showO2Recording = false; o2Result = result })

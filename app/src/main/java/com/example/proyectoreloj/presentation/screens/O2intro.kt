@@ -48,7 +48,7 @@ fun O2intro(onStartMeasure: () -> Unit = {}) {
             text = "Oxígeno en sangre",
             color = Color.White,
             fontWeight = FontWeight.Bold,
-            fontSize = 7.sp,
+            fontSize = 12.sp,
             textAlign = TextAlign.Center
         )
 
@@ -75,7 +75,7 @@ fun O2intro(onStartMeasure: () -> Unit = {}) {
         Text(
             text = "Ajuste la correa y evite cualquier\nmovimiento para asegurar la lectura.",
             color = Color.White,
-            fontSize = 7.sp,
+            fontSize = 12.sp,
             textAlign = TextAlign.Center,
             lineHeight = 14.sp,
             fontWeight = FontWeight.Bold
@@ -92,13 +92,13 @@ fun O2intro(onStartMeasure: () -> Unit = {}) {
             ),
             modifier = Modifier
                 .fillMaxWidth(0.4f) // El botón ocupa el 40% del ancho
-                .height(16.dp), // Misma altura exacta
+                .height(22.dp), // Misma altura exacta
             shape = RoundedCornerShape(50) // Bordes redondeados
         ) {
             Text(
                 text = "Medir",
                 fontWeight = FontWeight.Bold,
-                fontSize = 7.sp
+                fontSize = 12.sp
             )
         }
     }

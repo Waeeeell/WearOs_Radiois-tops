@@ -42,7 +42,7 @@ fun O2ResultScreen(result: Int, onFinish: () -> Unit) {
             text = "Resultado",
             color = Color(0xFF65D4F9),
             fontWeight = FontWeight.Bold,
-            fontSize = 7.sp,
+            fontSize = 12.sp,
             textAlign = TextAlign.Center
         )
 
@@ -55,11 +55,12 @@ fun O2ResultScreen(result: Int, onFinish: () -> Unit) {
             fontSize = 24.sp,
             textAlign = TextAlign.Center
         )
-        
+        Spacer(modifier = Modifier.height(15.dp))
+
         Text(
             text = "SpO2",
             color = Color.White,
-            fontSize = 8.sp,
+            fontSize = 12.sp,
             textAlign = TextAlign.Center
         )
 
@@ -73,13 +74,13 @@ fun O2ResultScreen(result: Int, onFinish: () -> Unit) {
             ),
             modifier = Modifier
                 .fillMaxWidth(0.5f)
-                .height(16.dp),
+                .height(22.dp),
             shape = RoundedCornerShape(50)
         ) {
             Text(
                 text = "Volver",
                 fontWeight = FontWeight.Bold,
-                fontSize = 7.sp
+                fontSize = 12.sp
             )
         }
     }

@@ -110,7 +110,7 @@ fun SosScreen(onSosTriggered: () -> Unit = {}) {
 
             fontWeight = FontWeight.Bold,
 
-            fontSize = 9.sp,
+            fontSize = 12.sp,
 
             textAlign = TextAlign.Center
 
@@ -132,7 +132,7 @@ fun SosScreen(onSosTriggered: () -> Unit = {}) {
 
             fontWeight = FontWeight.Normal,
 
-            fontSize = 8.sp,
+            fontSize = 12.sp,
 
             textAlign = TextAlign.Center,
 

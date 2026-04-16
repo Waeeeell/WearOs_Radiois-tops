@@ -1,5 +1,10 @@
 package com.example.radioistops.presentation.screens
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.BatteryManager
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,6 +18,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -43,6 +49,34 @@ fun HomeScreen(
     diasSuperados: Int = 7,
     diasRestantes: Int = 7
 ) {
+    // 1. Variable de estado para la batería
+    var batteryLevel by remember { mutableStateOf(0) }
+    val context = LocalContext.current
+
+    // 2. Definición del BroadcastReceiver
+    val batteryReceiver = remember {
+        object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                val level = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+                val scale = intent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
+
+                if (level != -1 && scale != -1) {
+                    batteryLevel = (level * 100 / scale.toFloat()).toInt()
+                }
+            }
+        }
+    }
+
+    // 3. Registro del receptor (DENTRO de un DisposableEffect)
+    DisposableEffect(Unit) {
+        val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        context.registerReceiver(batteryReceiver, filter)
+
+        onDispose {
+            context.unregisterReceiver(batteryReceiver)
+        }
+    }
+
     // Estado para la hora y fecha real
     var currentTime by remember { mutableStateOf(LocalTime.now()) }
     val timeFormatter = remember { DateTimeFormatter.ofPattern("HH:mm") }
@@ -77,13 +111,13 @@ fun HomeScreen(
             Row(
                 modifier = Modifier
                     .background(Color(0xFF4CAF50), RoundedCornerShape(50))
-                    .padding(horizontal = 8.dp, vertical = 1.dp),
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "72%",
+                    text = "$batteryLevel%",
                     color = Color.White,
-                    fontSize = 8.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -94,7 +128,7 @@ fun HomeScreen(
             Text(
                 text = LocalDate.now().format(dateFormatter),
                 color = Color.White,
-                fontSize = 8.sp,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Medium
             )
 
@@ -105,7 +139,7 @@ fun HomeScreen(
             Text(
                 text = currentTime.format(timeFormatter),
                 color = Color.White,
-                fontSize = 30.sp,
+                fontSize = 40.sp,
                 fontWeight = FontWeight.Normal,
                 modifier = Modifier.offset(y = (-4).dp)
             )
@@ -116,7 +150,7 @@ fun HomeScreen(
             Text(
                 text = mensajeApi,
                 color = Color.White,
-                fontSize = 8.sp,
+                fontSize = 12.sp,
                 textAlign = TextAlign.Center,
                 lineHeight = 15.sp,
                 modifier = Modifier.padding(horizontal = 24.dp)
@@ -125,8 +159,8 @@ fun HomeScreen(
 
         // --- 2. BARRA CURVA DE PROGRESO ---
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val strokeW = 10.dp.toPx()
-            val inset = 10.dp.toPx()
+            val strokeW = 14.dp.toPx()
+            val inset = 14.dp.toPx()
             val canvasSize = size.width - (inset * 2)
 
             val startAngle = 20f
@@ -167,10 +201,10 @@ fun HomeScreen(
             Text(
                 text = "$diasSuperados dias",
                 color = Color.White,
-                fontSize = 8.sp,
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .padding(start = 10.dp) // Ajuste latitudinal (centrado en trazo)
+                    .padding(start = 14.dp) // Ajuste latitudinal (centrado en trazo)
                     .rotate(-90f)
             )
         }
@@ -184,10 +218,10 @@ fun HomeScreen(
             Text(
                 text = "$diasRestantes dias",
                 color = Color.White,
-                fontSize = 8.sp,
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .padding(start = 10.dp) // Ajuste latitudinal (centrado en trazo)
+                    .padding(start = 14.dp) // Ajuste latitudinal (centrado en trazo)
                     .rotate(-90f)
             )
         }

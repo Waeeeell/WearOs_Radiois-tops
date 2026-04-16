@@ -1,5 +1,10 @@
 package com.example.radioistops.presentation.screens
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.BatteryManager
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,6 +18,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -45,6 +51,29 @@ fun ActivityScreen(
     diasRestantes: Int = 8,
     diaActual: Int = 8
 ) {
+    val context = LocalContext.current
+    var batteryLevel by remember { mutableStateOf(0) }
+
+    val batteryReceiver = remember {
+        object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                val level = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+                val scale = intent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
+                if (level != -1 && scale != -1) {
+                    batteryLevel = (level * 100 / scale.toFloat()).toInt()
+                }
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        context.registerReceiver(batteryReceiver, filter)
+        onDispose {
+            context.unregisterReceiver(batteryReceiver)
+        }
+    }
+
     // Calculamos la proporción para la barra curva (igual que HomeScreen)
     val totalDias = diasSuperados + diasRestantes
     val ratio = if (totalDias > 0) diasSuperados.toFloat() / totalDias else 0.5f
@@ -63,15 +92,26 @@ fun ActivityScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Hora (manteniendo el estilo solicitado pero ajustando a la jerarquía visual de Home)
-
-            Spacer(modifier = Modifier.height(18.dp))
-
+            // Batería (añadida para consistencia con HomeScreen)
+            Row(
+                modifier = Modifier
+                    .background(Color(0xFF4CAF50), RoundedCornerShape(50))
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "$batteryLevel%",
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
             // Título
             Text(
                 text = "Ya vas por la mitad!",
                 color = Color.White,
-                fontSize = 9.sp,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Bold
             )
 
@@ -89,7 +129,7 @@ fun ActivityScreen(
             Text(
                 text = mensajeCentral,
                 color = Color.White,
-                fontSize = 8.sp, // Tamaño de texto de HomeScreen (mensajeApi)
+                fontSize = 12.sp, // Tamaño de texto de HomeScreen (mensajeApi)
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
                 lineHeight = 15.sp, // LineHeight de HomeScreen
@@ -102,15 +142,15 @@ fun ActivityScreen(
             Text(
                 text = "Estás en el dia $diaActual",
                 color = Color.White,
-                fontSize = 8.sp, // Tamaño pequeño como en HomeScreen
+                fontSize = 12.sp, // Tamaño pequeño como en HomeScreen
                 fontWeight = FontWeight.Bold
             )
         }
 
         // --- 2. BARRA CURVA DE PROGRESO (Idéntica a HomeScreen) ---
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val strokeW = 10.dp.toPx() // Grosor de HomeScreen
-            val inset = 10.dp.toPx()   // Inset de HomeScreen
+            val strokeW = 14.dp.toPx() // Grosor de HomeScreen
+            val inset = 14.dp.toPx()   // Inset de HomeScreen
             val canvasSize = size.width - (inset * 2)
 
             val startAngle = 20f   // Ángulo de HomeScreen
@@ -150,10 +190,10 @@ fun ActivityScreen(
             Text(
                 text = "$diasSuperados dias",
                 color = Color.White,
-                fontSize = 8.sp,
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .padding(start = 10.dp) // Forzado hacia el interior para centrarse en el trazo de 10dp
+                    .padding(start = 14.dp) // Forzado hacia el interior para centrarse en el trazo de 10dp
                     .rotate(-90f)
             )
         }
@@ -167,10 +207,10 @@ fun ActivityScreen(
             Text(
                 text = "$diasRestantes dias",
                 color = Color.White,
-                fontSize = 8.sp,
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .padding(start = 10.dp) // Forzado hacia el interior para centrarse en el trazo de 10dp
+                    .padding(start = 14.dp) // Forzado hacia el interior para centrarse en el trazo de 10dp
                     .rotate(-90f)
             )
         }

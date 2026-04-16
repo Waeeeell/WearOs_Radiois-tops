@@ -48,7 +48,7 @@ fun EcgIntroScreen(onStartEcg: () -> Unit) {
             text = "Realizar Electrocardiograma",
             color = Color.White,
             fontWeight = FontWeight.Bold,
-            fontSize = 7.sp,
+            fontSize = 12.sp,
             textAlign = TextAlign.Center
         )
 
@@ -75,7 +75,7 @@ fun EcgIntroScreen(onStartEcg: () -> Unit) {
         Text(
             text = "Esta app NO detecta infartos.\nSi te sientes mal llama al 112 o\npresione SOS.",
             color = Color.White,
-            fontSize = 7.sp,
+            fontSize = 12.sp,
             textAlign = TextAlign.Center,
             lineHeight = 14.sp,
             fontWeight = FontWeight.Bold
@@ -92,13 +92,13 @@ fun EcgIntroScreen(onStartEcg: () -> Unit) {
             ),
             modifier = Modifier
                 .fillMaxWidth(0.4f) // El botón ocupa el 70% del ancho
-                .height(16.dp),
+                .height(25.dp),
             shape = RoundedCornerShape(50) // Bordes
         ) {
             Text(
                 text = "Iniciar",
                 fontWeight = FontWeight.Bold,
-                fontSize = 7.sp
+                fontSize = 12.sp
             )
         }
     }
