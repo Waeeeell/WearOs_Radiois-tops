@@ -65,13 +65,12 @@ fun WearNavGraph(
             0 -> {
                 if (watchEstado != null) {
                     HomeScreen(
-                        mensajeApi = watchEstado.mensajeApi,
+                        mensajeApi = watchEstado.mensajeApi ?: "Cargando...",
                         diasSuperados = watchEstado.diasSuperados,
                         diasRestantes = watchEstado.diasRestantes
-                        // Nota: HomeScreen no tiene parámetro porcentajeBateria aún
                     )
                 } else {
-                    HomeScreen()
+                    HomeScreen() // Muestra defaults si es nulo (cargando)
                 }
             }
             1 -> {
@@ -79,11 +78,16 @@ fun WearNavGraph(
                     ActivityScreen(
                         diasSuperados = watchEstado.diasSuperados,
                         diasRestantes = watchEstado.diasRestantes,
-                        diaActual = watchEstado.diaActual
-                        // Nota: ActivityScreen no tiene parámetros de título/mensaje aún
+                        diaActual = watchEstado.diaActual,
+                        // AQUÍ CONECTAMOS LAS INSTRUCCIONES DEL BACKEND
+                        instrucciones = if (!watchEstado.instrucciones.isNullOrEmpty()) {
+                            watchEstado.instrucciones!!
+                        } else {
+                            listOf("Sin instrucciones detalladas")
+                        }
                     )
                 } else {
-                    ActivityScreen()
+                    ActivityScreen() // Muestra defaults si es nulo (cargando)
                 }
             }
             2 -> EcgIntroScreen(onStartEcg)
