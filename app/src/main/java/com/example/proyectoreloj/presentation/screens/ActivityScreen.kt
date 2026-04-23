@@ -103,10 +103,9 @@ fun ActivityScreen(
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Batería
             Row(
@@ -123,7 +122,7 @@ fun ActivityScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(35.dp))
 
             // Instrucción rotante
             AnimatedContent(
@@ -165,8 +164,8 @@ fun ActivityScreen(
             Text(
                 text = "Día $diaActual",
                 color = Color.White,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Normal
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold
             )
         }
 
