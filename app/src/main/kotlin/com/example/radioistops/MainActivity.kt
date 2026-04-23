@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
-            val pagerState = rememberPagerState(pageCount = { 6 })
+            val pagerState = rememberPagerState(pageCount = { 5 })
             var showRecording by remember { mutableStateOf(false) }
             var showO2Recording by remember { mutableStateOf(false) }
             var ecgResult by remember { mutableStateOf<Int?>(null) }
@@ -91,9 +91,33 @@ fun WearNavGraph(
     HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
         when (page) {
             0 -> {
-                // ... (HomeScreen logic)
+                if (watchEstado != null) {
+                    HomeScreen(
+                        mensajeApi = watchEstado.mensajeApi ?: "Cargando...",
+                        diasSuperados = watchEstado.diasSuperados,
+                        diasRestantes = watchEstado.diasRestantes
+                    )
+                } else {
+                    HomeScreen()
+                }
             }
-            // ...
+            1 -> {
+                if (watchEstado != null) {
+                    ActivityScreen(
+                        diasSuperados = watchEstado.diasSuperados,
+                        diasRestantes = watchEstado.diasRestantes,
+                        diaActual = watchEstado.diaActual,
+                        instrucciones = if (!watchEstado.instrucciones.isNullOrEmpty()) {
+                            watchEstado.instrucciones!!
+                        } else {
+                            listOf("Sin instrucciones detalladas")
+                        }
+                    )
+                } else {
+                    ActivityScreen()
+                }
+            }
+            2 -> EcgIntroScreen(onStartEcg)
             3 -> SosScreen(
                 onSosTriggered = {
                     val hasPermission = ContextCompat.checkSelfPermission(
@@ -113,7 +137,7 @@ fun WearNavGraph(
                     }
                 }
             )
-            // ...
+            4 -> O2intro(onStartMeasure = onStartO2)
         }
     }
 }
