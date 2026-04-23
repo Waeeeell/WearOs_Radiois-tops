@@ -16,6 +16,7 @@ guava = "33.3.1-android"
 material3 = "1.4.0"
 uiToolingPreview = "1.10.6"
 uiTooling = "1.10.6"
+materialIconsExtended = "1.7.5"
 
 [libraries]
 play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
@@ -41,6 +42,7 @@ guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "uiToolingPreview" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
+material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

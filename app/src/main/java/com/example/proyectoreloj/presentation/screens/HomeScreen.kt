@@ -89,6 +89,13 @@ fun HomeScreen(
     val totalDias = diasSuperados + diasRestantes
     val ratio = if (totalDias > 0) diasSuperados.toFloat() / totalDias else 0f
 
+    // Lógica para el color de la batería
+    val batteryColor = when {
+        batteryLevel <= 15 -> Color(0xFFE53935) // Rojo
+        batteryLevel <= 30 -> Color(0xFFFFB300) // Amarillo
+        else -> Color(0xFF4CAF50)               // Verde
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -101,10 +108,10 @@ fun HomeScreen(
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Batería
+            // Batería con color dinámico
             Row(
                 modifier = Modifier
-                    .background(Color(0xFF4CAF50), RoundedCornerShape(50))
+                    .background(batteryColor, RoundedCornerShape(50))
                     .padding(horizontal = 12.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -149,15 +156,13 @@ fun HomeScreen(
             )
         }
 
-        // ── BARRA CURVA CORREGIDA ──────────────────────────────────────────────
         Canvas(modifier = Modifier.fillMaxSize()) {
             val strokeW    = 14.dp.toPx()
             val inset      = 14.dp.toPx()
             val canvasSize = size.width - (inset * 2)
-            val startAngle = 20f          // Empieza en la parte inferior derecha
-            val sweepTotal = 140f         // Va de derecha a izquierda
+            val startAngle = 20f
+            val sweepTotal = 140f
 
-            // 1. AZUL (derecha) — Días RESTANTES (Se dibuja primero)
             val sweepRestantes = sweepTotal * (1f - ratio)
             drawArc(
                 color = Color(0xFF2088A5),
@@ -169,11 +174,10 @@ fun HomeScreen(
                 style = Stroke(width = strokeW, cap = StrokeCap.Round)
             )
 
-            // 2. VERDE (izquierda) — Días SUPERADOS (Se dibuja a continuación)
             val sweepSuperados = sweepTotal * ratio
             drawArc(
                 color = Color(0xFF4CAF50),
-                startAngle = startAngle + sweepRestantes, // Empieza donde terminó el azul
+                startAngle = startAngle + sweepRestantes,
                 sweepAngle = sweepSuperados,
                 useCenter = false,
                 topLeft = Offset(inset, inset),
@@ -182,8 +186,6 @@ fun HomeScreen(
             )
         }
 
-        // ── ETIQUETAS EXTREMOS ─────────────────────────────────────────────────
-        // Izquierda → Días superados (Verde)
         Box(
             modifier = Modifier.fillMaxSize().rotate(152f),
             contentAlignment = Alignment.CenterEnd
@@ -197,7 +199,6 @@ fun HomeScreen(
             )
         }
 
-        // Derecha → Días restantes (Azul)
         Box(
             modifier = Modifier.fillMaxSize().rotate(28f),
             contentAlignment = Alignment.CenterEnd

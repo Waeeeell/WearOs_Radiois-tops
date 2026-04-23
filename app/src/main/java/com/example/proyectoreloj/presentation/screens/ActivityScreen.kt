@@ -95,6 +95,13 @@ fun ActivityScreen(
     val totalDias = diasSuperados + diasRestantes
     val ratio = if (totalDias > 0) diasSuperados.toFloat() / totalDias else 0f
 
+    // Lógica para el color de la batería
+    val batteryColor = when {
+        batteryLevel <= 15 -> Color(0xFFE53935) // Rojo
+        batteryLevel <= 30 -> Color(0xFFFFB300) // Amarillo
+        else -> Color(0xFF4CAF50)               // Verde
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -107,10 +114,10 @@ fun ActivityScreen(
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Batería
+            // Batería con color dinámico
             Row(
                 modifier = Modifier
-                    .background(Color(0xFF4CAF50), RoundedCornerShape(50))
+                    .background(batteryColor, RoundedCornerShape(50))
                     .padding(horizontal = 12.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -124,7 +131,6 @@ fun ActivityScreen(
 
             Spacer(modifier = Modifier.height(35.dp))
 
-            // Instrucción rotante
             AnimatedContent(
                 targetState = indiceActual,
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
@@ -140,7 +146,6 @@ fun ActivityScreen(
                 )
             }
 
-            // Puntitos indicadores
             if (instrucciones.size > 1) {
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -160,16 +165,14 @@ fun ActivityScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Día actual
             Text(
-                text = "Día $diaActual",
+                text = "Estas en el día $diaActual",
                 color = Color.White,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
         }
 
-        // ── BARRA CURVA CORREGIDA ──────────────────────────────────────────────
         Canvas(modifier = Modifier.fillMaxSize()) {
             val strokeW    = 14.dp.toPx()
             val inset      = 14.dp.toPx()
@@ -177,7 +180,6 @@ fun ActivityScreen(
             val startAngle = 20f
             val sweepTotal = 140f
 
-            // 1. AZUL (derecha) — Días RESTANTES
             val sweepRestantes = sweepTotal * (1f - ratio)
             drawArc(
                 color = Color(0xFF2088A5),
@@ -189,7 +191,6 @@ fun ActivityScreen(
                 style = Stroke(width = strokeW, cap = StrokeCap.Round)
             )
 
-            // 2. VERDE (izquierda) — Días SUPERADOS
             val sweepSuperados = sweepTotal * ratio
             drawArc(
                 color = Color(0xFF4CAF50),
@@ -202,7 +203,6 @@ fun ActivityScreen(
             )
         }
 
-        // ── ETIQUETAS EXTREMOS ─────────────────────────────────────────────────
         Box(
             modifier = Modifier.fillMaxSize().rotate(152f),
             contentAlignment = Alignment.CenterEnd
