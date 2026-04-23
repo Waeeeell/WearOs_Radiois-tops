@@ -48,7 +48,7 @@ fun EcgRecordingScreen(onFinish: (Int) -> Unit) {
     val healthClient = remember { HealthServices.getClient(context) }
     val measureClient = remember { healthClient.measureClient }
 
-    var timeLeft by remember { mutableStateOf(23) }
+    var timeLeft by remember { mutableStateOf(30) }
     var sensorValue by remember { mutableStateOf(0.0) }
     var hasPermission by remember {
         mutableStateOf(
@@ -128,7 +128,7 @@ fun EcgRecordingScreen(onFinish: (Int) -> Unit) {
 
         // 1. Texto de instrucción
         Text(
-            text = "Mantenga pulsado el botón superior\npara realizar el electrocardiograma",
+            text = "Mantenga el reloj firme y la muñeca inmóvil, Electrocardiograma en curso.",
             color = Color.White,
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,

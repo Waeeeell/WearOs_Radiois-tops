@@ -20,6 +20,16 @@ import com.example.radioistops.presentation.screens.*
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.TimeText
+import kotlinx.coroutines.launch
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.compose.ui.platform.LocalContext
 import com.example.radioistops.presentation.viewmodels.MainViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -28,7 +38,7 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
-            val pagerState = rememberPagerState(pageCount = { 5 })
+            val pagerState = rememberPagerState(pageCount = { 6 })
             var showRecording by remember { mutableStateOf(false) }
             var showO2Recording by remember { mutableStateOf(false) }
             var ecgResult by remember { mutableStateOf<Int?>(null) }
@@ -60,39 +70,50 @@ fun WearNavGraph(
     onStartO2: () -> Unit,
     watchEstado: WatchEstado?
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            Toast.makeText(context, "Llamando a emergencias...", Toast.LENGTH_LONG).show()
+            val callIntent = Intent(Intent.ACTION_CALL).apply {
+                data = Uri.parse("tel:112")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            context.startActivity(callIntent)
+        } else {
+            Toast.makeText(context, "Permiso de llamada denegado", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
         when (page) {
             0 -> {
-                if (watchEstado != null) {
-                    HomeScreen(
-                        mensajeApi = watchEstado.mensajeApi ?: "Cargando...",
-                        diasSuperados = watchEstado.diasSuperados,
-                        diasRestantes = watchEstado.diasRestantes
-                    )
-                } else {
-                    HomeScreen() // Muestra defaults si es nulo (cargando)
-                }
+                // ... (HomeScreen logic)
             }
-            1 -> {
-                if (watchEstado != null) {
-                    ActivityScreen(
-                        diasSuperados = watchEstado.diasSuperados,
-                        diasRestantes = watchEstado.diasRestantes,
-                        diaActual = watchEstado.diaActual,
-                        // AQUÍ CONECTAMOS LAS INSTRUCCIONES DEL BACKEND
-                        instrucciones = if (!watchEstado.instrucciones.isNullOrEmpty()) {
-                            watchEstado.instrucciones!!
-                        } else {
-                            listOf("Sin instrucciones detalladas")
+            // ...
+            3 -> SosScreen(
+                onSosTriggered = {
+                    val hasPermission = ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.CALL_PHONE
+                    ) == PackageManager.PERMISSION_GRANTED
+
+                    if (hasPermission) {
+                        Toast.makeText(context, "Llamando a emergencias...\nMantén el móvil cerca.", Toast.LENGTH_LONG).show()
+                        val callIntent = Intent(Intent.ACTION_CALL).apply {
+                            data = Uri.parse("tel:112")
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         }
-                    )
-                } else {
-                    ActivityScreen() // Muestra defaults si es nulo (cargando)
+                        context.startActivity(callIntent)
+                    } else {
+                        permissionLauncher.launch(Manifest.permission.CALL_PHONE)
+                    }
                 }
-            }
-            2 -> EcgIntroScreen(onStartEcg)
-            3 -> SosScreen()
-            4 -> O2intro(onStartMeasure = onStartO2)
+            )
+            // ...
         }
     }
 }

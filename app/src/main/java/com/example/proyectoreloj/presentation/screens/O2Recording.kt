@@ -44,7 +44,7 @@ fun O2recording(onFinish: (Int) -> Unit = {}) {
     val healthClient = remember { HealthServices.getClient(context) }
     val measureClient = remember { healthClient.measureClient }
 
-    var secondsLeft by remember { mutableIntStateOf(30) }
+    var secondsLeft by remember { mutableIntStateOf(20) }
     var sensorValue by remember { mutableStateOf(0.0) }
     var hasPermission by remember {
         mutableStateOf(
