@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,26 +41,27 @@ import kotlinx.coroutines.delay
 )
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen()
+    HomeScreen(
+        mensajeApi = "Aislamiento total.\nEvita todo contacto.",
+        diasSuperados = 2,
+        diasRestantes = 6
+    )
 }
 
 @Composable
 fun HomeScreen(
-    mensajeApi: String = "Sal a dar un paseo de 15\nminutos por el parque.",
-    diasSuperados: Int = 7,
-    diasRestantes: Int = 7
+    mensajeApi: String = "Aislamiento total.\nEvita todo contacto.",
+    diasSuperados: Int = 2,
+    diasRestantes: Int = 6
 ) {
-    // 1. Variable de estado para la batería
     var batteryLevel by remember { mutableStateOf(0) }
     val context = LocalContext.current
 
-    // 2. Definición del BroadcastReceiver
     val batteryReceiver = remember {
         object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 val level = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
                 val scale = intent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
-
                 if (level != -1 && scale != -1) {
                     batteryLevel = (level * 100 / scale.toFloat()).toInt()
                 }
@@ -67,22 +69,16 @@ fun HomeScreen(
         }
     }
 
-    // 3. Registro del receptor (DENTRO de un DisposableEffect)
     DisposableEffect(Unit) {
         val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         context.registerReceiver(batteryReceiver, filter)
-
-        onDispose {
-            context.unregisterReceiver(batteryReceiver)
-        }
+        onDispose { context.unregisterReceiver(batteryReceiver) }
     }
 
-    // Estado para la hora y fecha real
     var currentTime by remember { mutableStateOf(LocalTime.now()) }
     val timeFormatter = remember { DateTimeFormatter.ofPattern("HH:mm") }
     val dateFormatter = remember { DateTimeFormatter.ofPattern("d 'de' MMMM", Locale("es", "ES")) }
 
-    // Actualizar la hora cada segundo
     LaunchedEffect(Unit) {
         while (true) {
             currentTime = LocalTime.now()
@@ -90,9 +86,8 @@ fun HomeScreen(
         }
     }
 
-    // Calculamos la proporción para la barra curva
     val totalDias = diasSuperados + diasRestantes
-    val ratio = if (totalDias > 0) diasSuperados.toFloat() / totalDias else 0.5f
+    val ratio = if (totalDias > 0) diasSuperados.toFloat() / totalDias else 0f
 
     Box(
         modifier = Modifier
@@ -100,7 +95,6 @@ fun HomeScreen(
             .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
-        // --- 1. CONTENIDO CENTRAL ---
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -124,7 +118,6 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Fecha Actual (Ej: 13 de diciembre)
             Text(
                 text = LocalDate.now().format(dateFormatter),
                 color = Color.White,
@@ -132,10 +125,8 @@ fun HomeScreen(
                 fontWeight = FontWeight.Medium
             )
 
-            //Spacer(modifier = Modifier.height(10.dp))
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Hora Real Central (Ej: 18:31)
             Text(
                 text = currentTime.format(timeFormatter),
                 color = Color.White,
@@ -146,44 +137,44 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Mensaje Dinámico
             Text(
                 text = mensajeApi,
                 color = Color.White,
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
                 lineHeight = 15.sp,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
         }
 
-        // --- 2. BARRA CURVA DE PROGRESO ---
+        // ── BARRA CURVA CORREGIDA ──────────────────────────────────────────────
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val strokeW = 14.dp.toPx()
-            val inset = 14.dp.toPx()
+            val strokeW    = 14.dp.toPx()
+            val inset      = 14.dp.toPx()
             val canvasSize = size.width - (inset * 2)
+            val startAngle = 20f          // Empieza en la parte inferior derecha
+            val sweepTotal = 140f         // Va de derecha a izquierda
 
-            val startAngle = 20f
-            val sweepTotal = 140f
-
-
-            // Fondo de la barra
+            // 1. AZUL (derecha) — Días RESTANTES (Se dibuja primero)
+            val sweepRestantes = sweepTotal * (1f - ratio)
             drawArc(
                 color = Color(0xFF2088A5),
                 startAngle = startAngle,
-                sweepAngle = sweepTotal,
+                sweepAngle = sweepRestantes,
                 useCenter = false,
                 topLeft = Offset(inset, inset),
                 size = Size(canvasSize, canvasSize),
                 style = Stroke(width = strokeW, cap = StrokeCap.Round)
             )
 
-            // Progreso
-            val sweepGreen = sweepTotal * (1 - ratio)
+            // 2. VERDE (izquierda) — Días SUPERADOS (Se dibuja a continuación)
+            val sweepSuperados = sweepTotal * ratio
             drawArc(
                 color = Color(0xFF4CAF50),
-                startAngle = startAngle,
-                sweepAngle = sweepGreen,
+                startAngle = startAngle + sweepRestantes, // Empieza donde terminó el azul
+                sweepAngle = sweepSuperados,
                 useCenter = false,
                 topLeft = Offset(inset, inset),
                 size = Size(canvasSize, canvasSize),
@@ -191,41 +182,33 @@ fun HomeScreen(
             )
         }
 
-        // --- 3. TEXTOS EN LOS EXTREMOS DE LA BARRA ---
+        // ── ETIQUETAS EXTREMOS ─────────────────────────────────────────────────
+        // Izquierda → Días superados (Verde)
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .rotate(152f), // Ajuste longitudinal
+            modifier = Modifier.fillMaxSize().rotate(152f),
             contentAlignment = Alignment.CenterEnd
         ) {
             Text(
-                text = "$diasSuperados dias",
+                text = "$diasSuperados ${if (diasSuperados == 1) "dia" else "dias"}",
                 color = Color.White,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .padding(start = 14.dp) // Ajuste latitudinal (centrado en trazo)
-                    .rotate(-90f)
+                modifier = Modifier.padding(start = 14.dp).rotate(-90f)
             )
         }
 
+        // Derecha → Días restantes (Azul)
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .rotate(28f), // Ajuste longitudinal
+            modifier = Modifier.fillMaxSize().rotate(28f),
             contentAlignment = Alignment.CenterEnd
         ) {
             Text(
-                text = "$diasRestantes dias",
+                text = "$diasRestantes ${if (diasRestantes == 1) "dia" else "dias"}",
                 color = Color.White,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .padding(start = 14.dp) // Ajuste latitudinal (centrado en trazo)
-                    .rotate(-90f)
+                modifier = Modifier.padding(start = 14.dp).rotate(-90f)
             )
         }
     }
 }
-
-

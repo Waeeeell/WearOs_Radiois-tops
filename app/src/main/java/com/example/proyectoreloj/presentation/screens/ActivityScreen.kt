@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import androidx.compose.animation.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,16 +20,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.Text
+import kotlinx.coroutines.delay
 
 @Preview(
     device = Devices.WEAR_OS_SMALL_ROUND,
@@ -39,17 +38,26 @@ import androidx.wear.compose.material.Text
 @Composable
 fun ActivityScreenPreview() {
     ActivityScreen(
-        diasSuperados = 6,
-        diasRestantes = 8,
-        diaActual = 8
+        diasSuperados = 2,
+        diasRestantes = 6,
+        diaActual = 3,
+        instrucciones = listOf(
+            "Dormir sol",
+            "Rentar roba separada",
+            "Dos descàrregues de cisterna",
+            "Distància 1m amb adults",
+            "No contacte amb infants",
+            "Beu molta aigua"
+        )
     )
 }
 
 @Composable
 fun ActivityScreen(
-    diasSuperados: Int = 6,
-    diasRestantes: Int = 8,
-    diaActual: Int = 8
+    diasSuperados: Int = 2,
+    diasRestantes: Int = 6,
+    diaActual: Int = 3,
+    instrucciones: List<String> = listOf("Mantente en aislamiento total.")
 ) {
     val context = LocalContext.current
     var batteryLevel by remember { mutableStateOf(0) }
@@ -69,30 +77,38 @@ fun ActivityScreen(
     DisposableEffect(Unit) {
         val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         context.registerReceiver(batteryReceiver, filter)
-        onDispose {
-            context.unregisterReceiver(batteryReceiver)
+        onDispose { context.unregisterReceiver(batteryReceiver) }
+    }
+
+    var indiceActual by remember { mutableStateOf(0) }
+
+    LaunchedEffect(instrucciones) {
+        indiceActual = 0
+        if (instrucciones.size > 1) {
+            while (true) {
+                delay(4000L)
+                indiceActual = (indiceActual + 1) % instrucciones.size
+            }
         }
     }
 
-    // Calculamos la proporción para la barra curva (igual que HomeScreen)
     val totalDias = diasSuperados + diasRestantes
-    val ratio = if (totalDias > 0) diasSuperados.toFloat() / totalDias else 0.5f
+    val ratio = if (totalDias > 0) diasSuperados.toFloat() / totalDias else 0f
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black), // Fondo negro como HomeScreen
+            .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
-
-        // --- 1. CONTENIDO TEXTUAL CENTRAL ---
         Column(
             modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Batería (añadida para consistencia con HomeScreen)
+            // Batería
             Row(
                 modifier = Modifier
                     .background(Color(0xFF4CAF50), RoundedCornerShape(50))
@@ -106,73 +122,80 @@ fun ActivityScreen(
                     fontWeight = FontWeight.Bold
                 )
             }
-            Spacer(modifier = Modifier.height(24.dp))
-            // Título
-            Text(
-                text = "Ya vas por la mitad!",
-                color = Color.White,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
-            )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Mensaje central con texto coloreado (AnnotatedString)
-            val mensajeCentral = buildAnnotatedString {
-                append("Puedes salir a ")
-                withStyle(style = SpanStyle(color = Color(0xFF4CAF50))) { // Color Verde
-                    append("dar un paseo")
-                }
-                append(",\npero recuerda; de 15 minutos!")
+            // Instrucción rotante
+            AnimatedContent(
+                targetState = indiceActual,
+                transitionSpec = { fadeIn() togetherWith fadeOut() },
+                label = "instruccion_rotante"
+            ) { idx ->
+                Text(
+                    text = instrucciones.getOrElse(idx) { "" },
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                )
             }
 
-            Text(
-                text = mensajeCentral,
-                color = Color.White,
-                fontSize = 12.sp, // Tamaño de texto de HomeScreen (mensajeApi)
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center,
-                lineHeight = 15.sp, // LineHeight de HomeScreen
-                modifier = Modifier.padding(horizontal = 24.dp) // Padding de HomeScreen
-            )
+            // Puntitos indicadores
+            if (instrucciones.size > 1) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    instrucciones.forEachIndexed { i, _ ->
+                        Box(
+                            modifier = Modifier
+                                .size(if (i == indiceActual) 5.dp else 3.dp)
+                                .background(
+                                    color = if (i == indiceActual) Color.White
+                                    else Color(0xFF555555),
+                                    shape = RoundedCornerShape(50)
+                                )
+                        )
+                    }
+                }
+            }
 
-            Spacer(modifier = Modifier.height(22.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-            // Estado de día actual
+            // Día actual
             Text(
-                text = "Estás en el dia $diaActual",
+                text = "Día $diaActual",
                 color = Color.White,
-                fontSize = 12.sp, // Tamaño pequeño como en HomeScreen
-                fontWeight = FontWeight.Bold
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Normal
             )
         }
 
-        // --- 2. BARRA CURVA DE PROGRESO (Idéntica a HomeScreen) ---
+        // ── BARRA CURVA CORREGIDA ──────────────────────────────────────────────
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val strokeW = 14.dp.toPx() // Grosor de HomeScreen
-            val inset = 14.dp.toPx()   // Inset de HomeScreen
+            val strokeW    = 14.dp.toPx()
+            val inset      = 14.dp.toPx()
             val canvasSize = size.width - (inset * 2)
+            val startAngle = 20f
+            val sweepTotal = 140f
 
-            val startAngle = 20f   // Ángulo de HomeScreen
-            val sweepTotal = 140f  // Sweep de HomeScreen
-
-            // Fondo de la barra (Días Superados / Base)
+            // 1. AZUL (derecha) — Días RESTANTES
+            val sweepRestantes = sweepTotal * (1f - ratio)
             drawArc(
                 color = Color(0xFF2088A5),
                 startAngle = startAngle,
-                sweepAngle = sweepTotal,
+                sweepAngle = sweepRestantes,
                 useCenter = false,
                 topLeft = Offset(inset, inset),
                 size = Size(canvasSize, canvasSize),
                 style = Stroke(width = strokeW, cap = StrokeCap.Round)
             )
 
-            // Progreso (Días Restantes / Verde)
-            val sweepGreen = sweepTotal * (1 - ratio)
+            // 2. VERDE (izquierda) — Días SUPERADOS
+            val sweepSuperados = sweepTotal * ratio
             drawArc(
                 color = Color(0xFF4CAF50),
-                startAngle = startAngle,
-                sweepAngle = sweepGreen,
+                startAngle = startAngle + sweepRestantes,
+                sweepAngle = sweepSuperados,
                 useCenter = false,
                 topLeft = Offset(inset, inset),
                 size = Size(canvasSize, canvasSize),
@@ -180,38 +203,30 @@ fun ActivityScreen(
             )
         }
 
-        // --- 3. TEXTOS EN LOS EXTREMOS DE LA BARRA (Idénticos a HomeScreen) ---
+        // ── ETIQUETAS EXTREMOS ─────────────────────────────────────────────────
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .rotate(152f), // Alineado casi al extremo final
+            modifier = Modifier.fillMaxSize().rotate(152f),
             contentAlignment = Alignment.CenterEnd
         ) {
             Text(
-                text = "$diasSuperados dias",
+                text = "$diasSuperados ${if (diasSuperados == 1) "dia" else "dias"}",
                 color = Color.White,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .padding(start = 14.dp) // Forzado hacia el interior para centrarse en el trazo de 10dp
-                    .rotate(-90f)
+                modifier = Modifier.padding(start = 14.dp).rotate(-90f)
             )
         }
 
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .rotate(28f), // Alineado casi al extremo inicial
+            modifier = Modifier.fillMaxSize().rotate(28f),
             contentAlignment = Alignment.CenterEnd
         ) {
             Text(
-                text = "$diasRestantes dias",
+                text = "$diasRestantes ${if (diasRestantes == 1) "dia" else "dias"}",
                 color = Color.White,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .padding(start = 14.dp) // Forzado hacia el interior para centrarse en el trazo de 10dp
-                    .rotate(-90f)
+                modifier = Modifier.padding(start = 14.dp).rotate(-90f)
             )
         }
     }
