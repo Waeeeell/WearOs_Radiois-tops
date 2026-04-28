@@ -128,8 +128,8 @@ fun HomeScreen(
             Text(
                 text = LocalDate.now().format(dateFormatter),
                 color = Color.White,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -138,7 +138,7 @@ fun HomeScreen(
                 text = currentTime.format(timeFormatter),
                 color = Color.White,
                 fontSize = 40.sp,
-                fontWeight = FontWeight.Normal,
+                fontWeight = FontWeight.Medium,
                 modifier = Modifier.offset(y = (-4).dp)
             )
 
@@ -147,7 +147,7 @@ fun HomeScreen(
             Text(
                 text = mensajeApi,
                 color = Color.White,
-                fontSize = 12.sp,
+                fontSize = 14.sp,
                 textAlign = TextAlign.Center,
                 lineHeight = 15.sp,
                 maxLines = 2,

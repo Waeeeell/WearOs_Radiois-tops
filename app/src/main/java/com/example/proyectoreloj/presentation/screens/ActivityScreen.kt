@@ -163,7 +163,7 @@ fun ActivityScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
             Text(
                 text = "Estas en el día $diaActual",

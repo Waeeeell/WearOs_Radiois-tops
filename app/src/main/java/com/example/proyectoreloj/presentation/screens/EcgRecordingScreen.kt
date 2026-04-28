@@ -133,7 +133,8 @@ fun EcgRecordingScreen(onFinish: (Int) -> Unit) {
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
-            lineHeight = 14.sp
+            lineHeight = 14.sp,
+            modifier = Modifier.padding(horizontal = 7.dp)
         )
 
         Spacer(modifier = Modifier.height(7.dp))
@@ -159,7 +160,7 @@ fun EcgRecordingScreen(onFinish: (Int) -> Unit) {
             text = "${timeLeft}s",
             color = Color.White,
             fontWeight = FontWeight.Bold,
-            fontSize = 12.sp,
+            fontSize = 14.sp,
             textAlign = TextAlign.Center
         )
     }

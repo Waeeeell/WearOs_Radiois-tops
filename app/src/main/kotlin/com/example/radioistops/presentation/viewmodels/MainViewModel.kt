@@ -21,7 +21,7 @@ class MainViewModel : ViewModel() {
 
     // El CIP del paciente logueado — por ahora hardcodeado,
     // luego vendrá del login/SharedPreferences
-    private val cipPaciente = "LIES451231522"
+    private val cipPaciente = "VATC0805821234"
 
     init {
         cargarEstado()

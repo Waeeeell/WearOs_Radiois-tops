@@ -52,7 +52,7 @@ fun SosScreen(onSosTriggered: () -> Unit = {}) {
             text = "¿NECESITAS AYUDA?",
             color = Color.White,
             fontWeight = FontWeight.Bold,
-            fontSize = 12.sp,
+            fontSize = 14.sp,
             textAlign = TextAlign.Center
         )
 
@@ -62,8 +62,8 @@ fun SosScreen(onSosTriggered: () -> Unit = {}) {
         Text(
             text = "Desliza el botón rojo hacia\nla derecha para contactar\ncon emergencias",
             color = Color.White,
-            fontWeight = FontWeight.Normal,
-            fontSize = 11.sp,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
             textAlign = TextAlign.Center,
             lineHeight = 14.sp
         )
